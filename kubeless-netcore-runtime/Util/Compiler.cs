@@ -94,7 +94,7 @@ namespace kubeless_netcore_runtime.Util
                                     BindingFlags.Default | BindingFlags.InvokeMethod,
                                     null,
                                     obj,
-                                    new object[] { arguments[0] });
+                                    arguments);
 
             return returnedValue;
         }

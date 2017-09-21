@@ -16,7 +16,7 @@ namespace kubeless_netcore_runtime.Controllers
         [HttpPost]
         public object Post([FromBody]object data)
         {
-            var code = System.IO.File.ReadAllText(@"C:\tests\kubeless.cs");
+            var code = System.IO.File.ReadAllText(@"../examples/simple.cs");
 
             var className = "CustomClass";
             var functionName = "Execute";
