@@ -49,7 +49,7 @@ namespace kubeless_netcore_runtime.Util
             return new MetadataReference[]
                         {
                             MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
-                            MetadataReference.CreateFromFile(typeof(Enumerable).Assembly.Location),
+                            //MetadataReference.CreateFromFile(typeof(Enumerable).Assembly.Location),
                             MetadataReference.CreateFromFile(typeof(HttpClient).Assembly.Location),
                             MetadataReference.CreateFromFile(typeof(HttpRequest).Assembly.Location),
                         };
@@ -86,7 +86,7 @@ namespace kubeless_netcore_runtime.Util
         }
 
 
-        public string Execute(object[] arguments)
+        public object Execute(object[] arguments)
         {
             Type type = Assembly.GetType(ClassName);
             object obj = Activator.CreateInstance(type);
@@ -94,9 +94,9 @@ namespace kubeless_netcore_runtime.Util
                                     BindingFlags.Default | BindingFlags.InvokeMethod,
                                     null,
                                     obj,
-                                    new object[] { arguments[0], arguments[1] });
+                                    new object[] { arguments[0] });
 
-            return (string)returnedValue;
+            return returnedValue;
         }
 
         public string GetErrors()

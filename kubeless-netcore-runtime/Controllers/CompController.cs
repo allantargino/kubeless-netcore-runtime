@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using kubeless_netcore_runtime.Util;
+using System.Collections.Generic;
 
 namespace kubeless_netcore_runtime.Controllers
 {
@@ -13,22 +14,23 @@ namespace kubeless_netcore_runtime.Controllers
     {
         // GET: api/Comp
         [HttpPost]
-        public string Post([FromBody]object data)
+        public object Post([FromBody]object data)
         {
             var code = System.IO.File.ReadAllText(@"C:\tests\kubeless.cs");
 
-            var className = "CustomNamespace.CustomClass";
+            var className = "CustomClass";
             var functionName = "Execute";
 
             var objeto = (JObject)data;
-            string what = (string)objeto["what"];
+            string what = (string)objeto["message"];
 
             var compiler = new Compiler(code, className, functionName);
             var result = compiler.Start();
             if (result)
-                return compiler.Execute(new object[] { HttpContext.Request, what });
+                return compiler.Execute(new object[] { HttpContext.Request});
             else
                 return compiler.GetErrors();
         }
+        
     }
 }
