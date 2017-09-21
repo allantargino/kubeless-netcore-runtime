@@ -9,7 +9,6 @@ using System.Linq;
 using System.Net.Http;
 using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace kubeless_netcore_runtime.Util
 {
@@ -21,7 +20,6 @@ namespace kubeless_netcore_runtime.Util
         private IEnumerable<Diagnostic> Failures { get; set; }
         private Assembly Assembly { get; set; }
 
-
         public Compiler(string code, string className, string functionName)
         {
             Code = code;
@@ -29,6 +27,7 @@ namespace kubeless_netcore_runtime.Util
             FunctionName = functionName;
         }
 
+        #region compilation
 
         public bool Start()
         {
@@ -49,7 +48,7 @@ namespace kubeless_netcore_runtime.Util
             return new MetadataReference[]
                         {
                             MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
-                            //MetadataReference.CreateFromFile(typeof(Enumerable).Assembly.Location),
+                            MetadataReference.CreateFromFile(typeof(Enumerable).Assembly.Location),
                             MetadataReference.CreateFromFile(typeof(HttpClient).Assembly.Location),
                             MetadataReference.CreateFromFile(typeof(HttpRequest).Assembly.Location),
                         };
@@ -85,6 +84,9 @@ namespace kubeless_netcore_runtime.Util
             }
         }
 
+        #endregion
+
+        #region output
 
         public object Execute(object[] arguments)
         {
@@ -106,6 +108,8 @@ namespace kubeless_netcore_runtime.Util
                 builder.AppendLine(string.Format("{0}: {1}", diagnostic.Id, diagnostic.GetMessage()));
             return builder.ToString();
         }
+
+        #endregion
 
     }
 }

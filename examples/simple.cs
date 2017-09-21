@@ -3,7 +3,7 @@ using System.Net.Http;
 using Microsoft.AspNetCore.Http;
 using System.Collections.Generic;
 
-public class CustomClass
+public class MyCode
 {
     public int Execute(HttpRequest request)
     {
