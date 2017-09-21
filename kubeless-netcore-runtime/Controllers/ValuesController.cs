@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using System.Text;
 
 namespace kubeless_netcore_runtime.Controllers
 {
@@ -13,7 +14,13 @@ namespace kubeless_netcore_runtime.Controllers
         [HttpGet]
         public string Get()
         {
-            return "Hey, CSE Rocks!";
+            var response = new StringBuilder();
+
+            response.AppendLine("Hey, CSE Rocks!");
+            response.AppendLine($"MOD_NAME: {Environment.GetEnvironmentVariable("MOD_NAME")}");
+            response.AppendLine($"FUNC_HANDLER: {Environment.GetEnvironmentVariable("FUNC_HANDLER")}");
+
+            return response.ToString();
         }
 
         // POST api/values
