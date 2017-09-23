@@ -1,8 +1,8 @@
 ﻿namespace Kubeless.Core.Interfaces
 {
-    public interface IFileContent
+    public interface IFileContent<T>
     {
-        string Content { get; }
         string FilePath { get; }
+        T Content{ get; }
     }
 }

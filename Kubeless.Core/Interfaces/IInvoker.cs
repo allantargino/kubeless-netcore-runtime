@@ -2,6 +2,6 @@
 {
     public interface IInvoker
     {
-        object Execute(params object[] parameters);
+        object Execute(IFunction function, params object[] parameters);
     }
 }

@@ -38,7 +38,6 @@ namespace Kubeless.WebAPI.Controllers
             return CallFunction();
         }
 
-
         [HttpGet]
         [Route("/report")]
         public string FunctionReport()
@@ -50,7 +49,7 @@ namespace Kubeless.WebAPI.Controllers
         {
             if (!_function.IsCompiled())
                 _compiler.Compile(_function);
-            return _invoker.Execute(Request);
+            return _invoker.Execute(_function, Request);
         }
         
     }

@@ -17,8 +17,6 @@ namespace Kubeless.Core.Models
 
         public bool IsCompiled()
         {
-            //var functionAssemblyPath = _configuration["Compiler:FunctionAssemblyPath"];
-
             throw new NotImplementedException();
         }
     }

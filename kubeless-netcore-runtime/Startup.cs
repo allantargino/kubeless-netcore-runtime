@@ -27,7 +27,8 @@ namespace kubeless_netcore_runtime
         {
             services.AddMvc();
 
-            services.AddSingleton<IFunctionSettings>(FunctionFactory.BuildKubelessFunction());
+            services.AddSingleton<IFunctionSettings>(FunctionFactory.BuildFunctionSettings(Configuration));
+            services.AddSingleton<IFunction>(FunctionFactory.BuildFunction(Configuration));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -36,6 +37,10 @@ namespace kubeless_netcore_runtime
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+
+                //Set fixed enviroment variables for example function:
+                Environment.SetEnvironmentVariable("MOD_NAME", "mycode");
+                Environment.SetEnvironmentVariable("FUNC_HANDLER", "execute");
             }
 
             app.UseMvc();

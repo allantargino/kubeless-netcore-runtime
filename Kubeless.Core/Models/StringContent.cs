@@ -3,12 +3,12 @@ using System.IO;
 
 namespace Kubeless.Core.Models
 {
-    public class FileContent : IFileContent
+    public class StringContent : IFileContent<string>
     {
         public string FilePath { get; }
         public string Content { get; }
 
-        public FileContent(string filePath)
+        public StringContent(string filePath)
         {
             if (!File.Exists(filePath))
                 throw new FileNotFoundException(nameof(filePath));

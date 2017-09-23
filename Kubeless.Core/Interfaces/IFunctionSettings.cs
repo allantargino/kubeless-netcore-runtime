@@ -2,9 +2,10 @@
 {
     public interface IFunctionSettings
     {
-        IFileContent Code { get; }
-        IFileContent Requirements { get; }
-        string FunctionHandler { get; }
         string ModuleName { get; }
+        string FunctionHandler { get; }
+        IFileContent<string> Code { get; }
+        IFileContent<string> Requirements { get; }
+        IFileContent<byte[]> Assembly { get; }
     }
 }

@@ -1,20 +1,14 @@
 ﻿using Kubeless.Core.Interfaces;
 using Kubeless.Core.Models;
+using Microsoft.Extensions.Configuration;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Kubeless.WebAPI.Utils
 {
     public class FunctionFactory
     {
-        public static IFunctionSettings BuildKubelessFunction()
+        public static IFunctionSettings BuildFunctionSettings(IConfiguration configuration)
         {
-            //TODO: remove
-            Environment.SetEnvironmentVariable("MOD_NAME", "mycode");
-            Environment.SetEnvironmentVariable("FUNC_HANDLER", "execute");
-
             var moduleName = Environment.GetEnvironmentVariable("MOD_NAME");
             if (string.IsNullOrEmpty(moduleName))
                 throw new ArgumentNullException("MOD_NAME");
@@ -23,16 +17,23 @@ namespace Kubeless.WebAPI.Utils
             if (string.IsNullOrEmpty(moduleName))
                 throw new ArgumentNullException("FUNC_HANDLER");
 
-            //TODO: mount file system on linux and document
             //var codePath = string.Concat("/kubeless/", className, ".cs"); //Linux fixed path
             var codePath = string.Concat(@"..\examples\", moduleName, ".cs"); //Windows relative tests path
-            var code = new FileContent(codePath);
+            var code = new StringContent(codePath);
 
-            //var dependenciesPath = string.Concat("/kubeless/", "dependencies", ".xml"); //Linux fixed path
-            var dependenciesPath = string.Concat(@"..\examples\", "dependencies", ".xml"); //Windows relative tests path
-            var requirements = new FileContent(dependenciesPath);
+            //var requirementsPath = string.Concat("/kubeless/", "requirements", ".xml"); //Linux fixed path
+            var requirementsPath = string.Concat(@"..\examples\", "requirements", ".xml"); //Windows relative tests path
+            var requirements = new StringContent(requirementsPath);
 
-            return new FunctionSettings(moduleName, functionHandler, code, requirements);
+            var assemblyPath = configuration["Compiler:FunctionAssemblyPath"];
+            var assembly = new BinaryContent(assemblyPath);
+
+            return new FunctionSettings(moduleName, functionHandler, code, requirements, assembly);
+        }
+
+        public static IFunction BuildFunction(IConfiguration configuration)
+        {
+            throw new NotImplementedException();
         }
     }
 }
