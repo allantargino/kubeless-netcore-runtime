@@ -8,6 +8,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Kubeless.Core.Interfaces;
+using Kubeless.WebAPI.Utils;
 
 namespace kubeless_netcore_runtime
 {
@@ -24,6 +26,8 @@ namespace kubeless_netcore_runtime
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
+
+            services.AddSingleton<IFunctionSettings>(FunctionFactory.BuildKubelessFunction());
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

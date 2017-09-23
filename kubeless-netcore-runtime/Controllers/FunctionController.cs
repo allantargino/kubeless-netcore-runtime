@@ -1,57 +1,57 @@
 ﻿using System;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using kubeless_netcore_runtime.Util;
+using Kubeless.Core.Interfaces;
+using Microsoft.Extensions.Configuration;
+using Kubeless.WebAPI.Utils;
 
-namespace kubeless_netcore_runtime.Controllers
+namespace Kubeless.WebAPI.Controllers
 {
-    //[Produces("application/json")]
     [Route("/")]
     public class FunctionController : Controller
     {
+        private IFunction _function;
+        private ICompiler _compiler;
+        private IInvoker _invoker;
+        private IConfiguration _configuration;
+
+        public FunctionController(IFunction function, ICompiler compiler, IInvoker invoker, IConfiguration configuration)
+        {
+            _function = function;
+            _compiler = compiler;
+            _invoker = invoker;
+            _configuration = configuration;
+        }
 
         [HttpPost]
         public object Post([FromBody]object data)
         {
-            try
-            {
-                return CompileAndExecuteFunction(data);
-            }
-            catch (Exception ex)
-            {
-                return ex.Message;
-            }
+            if (Request.Body.CanSeek)
+                Request.Body.Position = 0;
+
+            return CallFunction();
         }
 
         [HttpGet]
-        public string Get()
+        public object Get()
         {
-            return "NotImplemented";
+            return CallFunction();
         }
 
-        private object CompileAndExecuteFunction(object data)
+
+        [HttpGet]
+        [Route("/report")]
+        public string FunctionReport()
         {
-            var className = Environment.GetEnvironmentVariable("MOD_NAME");
-            Console.WriteLine($"==> Class name: {className}");
-            var functionName = Environment.GetEnvironmentVariable("FUNC_HANDLER");
-            Console.WriteLine($"==> Function name: {functionName}");
-
-            var codeFile = string.Concat("/kubeless/", className, ".cs");
-            Console.WriteLine($"==> Code file: {codeFile}");
-            var code = System.IO.File.ReadAllText(codeFile);
-            Console.WriteLine($"==> Code:\n{code}");
-
-            var compiler = new Compiler(code, className, functionName);
-
-            //TODO: Install dependencies from project.json file
-            //var dependencies = "/kubeless/project.json";
-
-            var result = compiler.Start();
-            if (result)
-                return compiler.Execute(new object[] { HttpContext.Request });
-            else
-                return compiler.GetErrors();
+            return new ReportBuilder(_function.FunctionSettings, _configuration).GetReport();
         }
 
+        private object CallFunction()
+        {
+            if (!_function.IsCompiled())
+                _compiler.Compile(_function);
+            return _invoker.Execute(Request);
+        }
+        
     }
 }

@@ -3,9 +3,9 @@ using System.Net.Http;
 using Microsoft.AspNetCore.Http;
 using System.Collections.Generic;
 
-public class MyCode
+public class mycode
 {
-    public int Execute(HttpRequest request)
+    public int execute(HttpRequest request)
     {
         var http = new HttpClient();
         var result = DoSomeMath(3,5);
