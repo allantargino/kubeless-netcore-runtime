@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Utils\" />
+    <PackageReference Include="Microsoft.CodeAnalysis" Version="2.3.2" />
   </ItemGroup>
 
 </Project>

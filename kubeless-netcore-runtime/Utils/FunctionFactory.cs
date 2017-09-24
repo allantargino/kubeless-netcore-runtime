@@ -17,6 +17,7 @@ namespace Kubeless.WebAPI.Utils
             if (string.IsNullOrEmpty(moduleName))
                 throw new ArgumentNullException("FUNC_HANDLER");
 
+            //TODO: Move paths to appsettings.json
             //var codePath = string.Concat("/kubeless/", className, ".cs"); //Linux fixed path
             var codePath = string.Concat(@"..\examples\", moduleName, ".cs"); //Windows relative tests path
             var code = new StringContent(codePath);
@@ -25,7 +26,7 @@ namespace Kubeless.WebAPI.Utils
             var requirementsPath = string.Concat(@"..\examples\", "requirements", ".xml"); //Windows relative tests path
             var requirements = new StringContent(requirementsPath);
 
-            var assemblyPath = configuration["Compiler:FunctionAssemblyPath"];
+            var assemblyPath = string.Concat(configuration["Compiler:FunctionAssemblyPath"], moduleName, ".dll");
             var assembly = new BinaryContent(assemblyPath);
 
             return new FunctionSettings(moduleName, functionHandler, code, requirements, assembly);
@@ -33,7 +34,8 @@ namespace Kubeless.WebAPI.Utils
 
         public static IFunction BuildFunction(IConfiguration configuration)
         {
-            throw new NotImplementedException();
+            var settings = BuildFunctionSettings(configuration);
+            return new Function(settings);
         }
     }
 }

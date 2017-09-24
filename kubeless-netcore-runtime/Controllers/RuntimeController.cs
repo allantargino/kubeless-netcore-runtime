@@ -8,14 +8,14 @@ using Kubeless.WebAPI.Utils;
 namespace Kubeless.WebAPI.Controllers
 {
     [Route("/")]
-    public class FunctionController : Controller
+    public class RuntimeController : Controller
     {
         private IFunction _function;
         private ICompiler _compiler;
         private IInvoker _invoker;
         private IConfiguration _configuration;
 
-        public FunctionController(IFunction function, ICompiler compiler, IInvoker invoker, IConfiguration configuration)
+        public RuntimeController(IFunction function, ICompiler compiler, IInvoker invoker, IConfiguration configuration)
         {
             _function = function;
             _compiler = compiler;
