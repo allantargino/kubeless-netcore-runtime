@@ -1,4 +1,5 @@
 ﻿using Kubeless.Core.Interfaces;
+using Kubeless.Core.Models;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Text;
@@ -44,10 +45,14 @@ namespace Kubeless.WebAPI.Utils
             builder.AppendCode("Code content", _functionSettings.Code.Content);
             builder.AppendKeyValue("Requirements file path", _functionSettings.Requirements.FilePath);
             builder.AppendCode("Requirements content", _functionSettings.Requirements.Content);
+            builder.AppendKeyValue("Assembly file path", _functionSettings.Assembly.FilePath);
+            builder.AppendKeyValue("Assembly exists", ((BinaryContent)_functionSettings.Assembly).Exists.ToString());
         }
 
         private void BuildConfigurationReport(StringBuilder builder)
         {
+            builder.AppendKeyValue("CodePath", _configuration["Compiler:CodePath"]);
+            builder.AppendKeyValue("RequirementsPath", _configuration["Compiler:RequirementsPath"]);
             builder.AppendKeyValue("FunctionAssemblyPath", _configuration["Compiler:FunctionAssemblyPath"]);
         }
 

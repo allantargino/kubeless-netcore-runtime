@@ -1,9 +1,7 @@
-﻿using System;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Kubeless.Core.Interfaces;
-using Microsoft.Extensions.Configuration;
+﻿using Kubeless.Core.Interfaces;
 using Kubeless.WebAPI.Utils;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 
 namespace Kubeless.WebAPI.Controllers
 {
