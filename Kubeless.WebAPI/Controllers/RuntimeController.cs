@@ -1,5 +1,4 @@
 ﻿using Kubeless.Core.Interfaces;
-using Kubeless.WebAPI.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 
@@ -34,13 +33,6 @@ namespace Kubeless.WebAPI.Controllers
         public object Get()
         {
             return CallFunction();
-        }
-
-        [HttpGet]
-        [Route("/report")]
-        public string FunctionReport()
-        {
-            return new ReportBuilder(_function.FunctionSettings, _configuration).GetReport();
         }
 
         private object CallFunction()
