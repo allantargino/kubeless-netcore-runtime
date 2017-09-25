@@ -10,11 +10,9 @@ namespace Kubeless.Core.Models
 
         public StringContent(string filePath)
         {
-            if (!File.Exists(filePath))
-                throw new FileNotFoundException(nameof(filePath));
-
             this.FilePath = filePath;
-            this.Content = File.ReadAllText(filePath);
+            if (File.Exists(filePath))
+                this.Content = File.ReadAllText(filePath);
         }
     }
 }

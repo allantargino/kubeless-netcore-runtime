@@ -13,7 +13,8 @@ namespace Kubeless.Core.Models
         {
             referencesManager = new List<IReferencesManager>()
             {
-                new NativeReferencesManager()
+                new NativeReferencesManager(),
+                new NugetReferencesManager()
             };
         }
 
