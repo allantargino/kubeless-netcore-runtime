@@ -12,7 +12,7 @@ namespace Kubeless.Core.Models
     {
         private static readonly string SharedPath = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ?
             Path.Combine(Environment.GetEnvironmentVariable("ProgramFiles"), @"dotnet\shared\Microsoft.NETCore.App\2.0.0\") :
-            Path.Combine("./usr/share", @"dotnet/shared/Microsoft.NETCore.App/2.0.0/");
+            Path.Combine("/usr/share", @"dotnet/shared/Microsoft.NETCore.App/2.0.0/");
 
         public MetadataReference[] GetReferences()
         {

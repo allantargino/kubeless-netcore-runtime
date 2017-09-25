@@ -13,5 +13,5 @@ RUN dotnet publish -c Release -o out
 # Build runtime image
 FROM microsoft/aspnetcore:2.0
 WORKDIR /app
-COPY --from=build-env /app/Kubeless.WebAPI/out .
+COPY --from=build-env /app/src/Kubeless.WebAPI/out .
 ENTRYPOINT ["dotnet", "Kubeless.WebAPI.dll"]
