@@ -287,4 +287,8 @@ __pycache__/
 *.odx.cs
 *.xsd.cs
 
+# Artifacts
 *.dll
+
+# VS Code
+.vscode/
