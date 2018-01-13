@@ -17,14 +17,15 @@ namespace kubeless_netcore_runtime
             BuildWebHost(args).Run();
         }
 
-        public static IWebHost BuildWebHost(string[] args) =>
+        public static IWebHost BuildWebHost(string[] args)
+        {
             var envPortStr = Environment.GetEnvironmentVariable("FUNC_PORT");
-            var urls = "http://*:8080";
-            if (!string.IsNullOrEmpty(envPortStr))
-                urls = string.Concat("http://*:", envPortStr)
-            WebHost.CreateDefaultBuilder(args)
+            var port = string.IsNullOrWhiteSpace(envPortStr) ? "8080" : envPortStr;
+
+            return WebHost.CreateDefaultBuilder(args)
                 .UseStartup<Startup>()
-                .UseUrls(urls)
+                .UseUrls($"http://*:{port}")
                 .Build();
+        }
     }
 }
