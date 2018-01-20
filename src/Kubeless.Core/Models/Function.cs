@@ -1,20 +1,15 @@
-﻿using Kubeless.Core.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace Kubeless.Core.Models
+﻿namespace Kubeless.Core.Models
 {
+    using Kubeless.Core.Interfaces;
+    
     public class Function : IFunction
     {
-        public IFunctionSettings FunctionSettings { get; }
-
         public Function(IFunctionSettings functionSettings)
         {
-            FunctionSettings = functionSettings;
+            this.FunctionSettings = functionSettings;
         }
+
+        public IFunctionSettings FunctionSettings { get; }
 
         public bool IsCompiled()
         {

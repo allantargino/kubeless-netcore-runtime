@@ -1,7 +1,7 @@
-﻿using Microsoft.CodeAnalysis;
-
-namespace Kubeless.Core.Interfaces
+﻿namespace Kubeless.Core.Interfaces
 {
+    using Microsoft.CodeAnalysis;
+    
     public interface IReferencesManager
     {
         MetadataReference[] GetReferences();

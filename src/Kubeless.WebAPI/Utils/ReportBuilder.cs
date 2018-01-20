@@ -1,25 +1,25 @@
-﻿using Kubeless.Core.Interfaces;
-using Kubeless.Core.Models;
-using Microsoft.Extensions.Configuration;
-using System;
-using System.Text;
-
-namespace Kubeless.WebAPI.Utils
+﻿namespace Kubeless.WebAPI.Utils
 {
+    using System;
+    using System.Text;
+    using Kubeless.Core.Interfaces;
+    using Kubeless.Core.Models;
+    using Microsoft.Extensions.Configuration;
+
     public class ReportBuilder
     {
-        private IFunctionSettings _functionSettings;
-        private IConfiguration _configuration;
+        private readonly IFunctionSettings functionSettings;
+        private readonly IConfiguration configuration;
 
         public ReportBuilder(IFunctionSettings functionSettings, IConfiguration configuration)
         {
-            _functionSettings = functionSettings;
-            _configuration = configuration;
+            this.functionSettings = functionSettings;
+            this.configuration = configuration;
         }
 
         public string GetReport()
         {
-            var builder = new StringBuilder();
+            StringBuilder builder = new StringBuilder();
 
             BuildHeader(builder);
             BuildFunctionReport(builder);
@@ -28,7 +28,6 @@ namespace Kubeless.WebAPI.Utils
 
             return builder.ToString();
         }
-
 
         private void BuildHeader(StringBuilder builder)
         {
@@ -39,21 +38,21 @@ namespace Kubeless.WebAPI.Utils
 
         private void BuildFunctionReport(StringBuilder builder)
         {
-            builder.AppendKeyValue("Module/Class name", _functionSettings.ModuleName);
-            builder.AppendKeyValue("Function Handler name", _functionSettings.FunctionHandler);
-            builder.AppendKeyValue("Code file path", _functionSettings.Code.FilePath);
-            builder.AppendCode("Code content", _functionSettings.Code.Content);
-            builder.AppendKeyValue("Requirements file path", _functionSettings.Requirements.FilePath);
-            builder.AppendCode("Requirements content", _functionSettings.Requirements.Content);
-            builder.AppendKeyValue("Assembly file path", _functionSettings.Assembly.FilePath);
-            builder.AppendKeyValue("Assembly exists", ((BinaryContent)_functionSettings.Assembly).Exists.ToString());
+            builder.AppendKeyValue("Module/Class name", this.functionSettings.ModuleName);
+            builder.AppendKeyValue("Function Handler name", this.functionSettings.FunctionHandler);
+            builder.AppendKeyValue("Code file path", this.functionSettings.Code.FilePath);
+            builder.AppendCode("Code content", this.functionSettings.Code.Content);
+            builder.AppendKeyValue("Requirements file path", this.functionSettings.Requirements.FilePath);
+            builder.AppendCode("Requirements content", this.functionSettings.Requirements.Content);
+            builder.AppendKeyValue("Assembly file path", this.functionSettings.Assembly.FilePath);
+            builder.AppendKeyValue("Assembly exists", ((BinaryContent)this.functionSettings.Assembly).Exists.ToString());
         }
 
         private void BuildConfigurationReport(StringBuilder builder)
         {
-            builder.AppendKeyValue("CodePath", _configuration["Compiler:CodePath"]);
-            builder.AppendKeyValue("RequirementsPath", _configuration["Compiler:RequirementsPath"]);
-            builder.AppendKeyValue("FunctionAssemblyPath", _configuration["Compiler:FunctionAssemblyPath"]);
+            builder.AppendKeyValue("CodePath", this.configuration["Compiler:CodePath"]);
+            builder.AppendKeyValue("RequirementsPath", this.configuration["Compiler:RequirementsPath"]);
+            builder.AppendKeyValue("FunctionAssemblyPath", this.configuration["Compiler:FunctionAssemblyPath"]);
         }
 
         private void BuildFooter(StringBuilder builder)
@@ -62,6 +61,5 @@ namespace Kubeless.WebAPI.Utils
             builder.AppendLine("--------------------------------------------------");
             builder.AppendLine(DateTime.Now.ToString());
         }
-
     }
 }

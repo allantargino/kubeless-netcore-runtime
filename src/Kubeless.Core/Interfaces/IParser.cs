@@ -1,10 +1,7 @@
-﻿using Microsoft.CodeAnalysis;
-using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Kubeless.Core.Interfaces
+﻿namespace Kubeless.Core.Interfaces
 {
+    using Microsoft.CodeAnalysis;
+
     public interface IParser
     {
         SyntaxTree ParseText(string code);

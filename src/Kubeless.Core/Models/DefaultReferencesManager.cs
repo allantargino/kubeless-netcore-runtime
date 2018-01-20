@@ -1,17 +1,16 @@
-﻿using Kubeless.Core.Interfaces;
-using System;
-using System.Collections.Generic;
-using Microsoft.CodeAnalysis;
-
-namespace Kubeless.Core.Models
+﻿namespace Kubeless.Core.Models
 {
+    using Kubeless.Core.Interfaces;
+    using System.Collections.Generic;
+    using Microsoft.CodeAnalysis;
+
     public class DefaultReferencesManager : IReferencesManager
     {
         private IEnumerable<IReferencesManager> referencesManager;
 
         public DefaultReferencesManager()
         {
-            referencesManager = new List<IReferencesManager>()
+            this.referencesManager = new List<IReferencesManager>()
             {
                 new SharedReferencesManager(),
                 new StoreReferencesManager()
@@ -20,9 +19,11 @@ namespace Kubeless.Core.Models
 
         public MetadataReference[] GetReferences()
         {
-            var references = new List<MetadataReference>();
-            foreach (var manager in referencesManager)
+            List<MetadataReference> references = new List<MetadataReference>();
+            foreach (IReferencesManager manager in referencesManager)
+            {
                 references.AddRange(manager.GetReferences());
+            }
             return references.ToArray();
         }
     }

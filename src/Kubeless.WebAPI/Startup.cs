@@ -1,30 +1,24 @@
-﻿using System;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Kubeless.Core.Interfaces;
-using Kubeless.WebAPI.Utils;
-using Kubeless.Core.Models;
-
-namespace kubeless_netcore_runtime
+﻿namespace Kubeless.WebAPI
 {
-    public class Startup
+    using System;
+    using Microsoft.AspNetCore.Builder;
+    using Microsoft.AspNetCore.Hosting;
+    using Microsoft.Extensions.Configuration;
+    using Microsoft.Extensions.DependencyInjection;
+    using Kubeless.Core.Interfaces;
+    using Kubeless.WebAPI.Utils;
+    using Kubeless.Core.Models;
+
+    public sealed class Startup
     {
         public Startup(IConfiguration configuration, IHostingEnvironment env)
         {
-            Configuration = configuration;
+            this.Configuration = configuration;
 
-            if (env.IsDevelopment())
+            if (!env.IsDevelopment())
             {
-                //Set fixed enviroment variables for example function:
-                Environment.SetEnvironmentVariable("MOD_NAME", "mycode");
-                Environment.SetEnvironmentVariable("FUNC_HANDLER", "execute");
+                // TODO: Get latest available version.
                 Environment.SetEnvironmentVariable("DOTNETCORESHAREDREF_VERSION", "2.0.5");
-            }
-            else
-            {
-                Environment.SetEnvironmentVariable("DOTNETCORESHAREDREF_VERSION", "2.0.0");
             }
         }
 
@@ -35,15 +29,19 @@ namespace kubeless_netcore_runtime
         {
             services.AddMvc();
 
-            //Compile Function.
-            var function = FunctionFactory.BuildFunction(Configuration);
-            var compiler = new DefaultCompiler(new DefaultParser(), new DefaultReferencesManager());
+            // Compile Function.
+            IFunction function = FunctionFactory.BuildFunction(this.Configuration);
+            ICompiler compiler = new DefaultCompiler(new DefaultParser(), new DefaultReferencesManager());
 
             if (!function.IsCompiled())
+            {
                 compiler.Compile(function);
+            }
 
             services.AddSingleton<IFunction>(function);
-            services.AddSingleton<IInvoker>(new DefaultInvoker());
+            services.AddSingleton<IFunctionSettings>(serviceProvider => serviceProvider.GetService<IFunction>().FunctionSettings);
+            services.AddSingleton<IInvoker, DefaultInvoker>();
+            services.AddSingleton<ReportBuilder>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

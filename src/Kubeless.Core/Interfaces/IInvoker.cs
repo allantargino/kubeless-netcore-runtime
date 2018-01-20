@@ -1,7 +1,9 @@
 ﻿namespace Kubeless.Core.Interfaces
 {
+    using System.Threading.Tasks;
+
     public interface IInvoker
     {
-        object Execute(IFunction function, params object[] parameters);
+        Task<object> Execute(IFunction function, params object[] parameters);
     }
 }
