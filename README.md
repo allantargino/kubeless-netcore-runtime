@@ -8,9 +8,9 @@ Functions triggered by the http-trigger can be implemented using the async/await
 
 ## Create a function
 
-To create a function simply execute `dotnet new classlib -o MyFunction` to create a `netstandard2.0` class library project. Change the name of the generated default class `Class1` to something useful. The name of the class ist the name of your new function. You can use namespaces and add NuGet packages to the `*.csproj` file like you would with any other class libary roject.
+To create a function simply execute `dotnet new classlib -o MyFunction` to create a `netstandard2.0` class library project. Change the name of the generated default class `Class1` to something useful. The name of the class ist the name of your new function. You can use namespaces and add NuGet packages to the `*.csproj` file like you would with any other class library project.
 
-You can name the function handler method anything you like, but the method must declare one parameter: the `HttpContext` of the http request. The method can return any value you like. 
+You can name the function handler method anything you like, but the method must declare one parameter: the `HttpContext` of the http request. The method can return any value. 
 
 ```csharp
 namespace Functions
