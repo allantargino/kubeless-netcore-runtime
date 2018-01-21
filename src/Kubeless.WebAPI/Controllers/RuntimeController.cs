@@ -1,5 +1,6 @@
 ﻿namespace Kubeless.WebAPI.Controllers
 {
+    using System.Diagnostics;
     using System.Threading.Tasks;
     using Kubeless.Core.Interfaces;
     using Microsoft.AspNetCore.Mvc;
@@ -33,7 +34,13 @@
         [HttpGet]
         public async Task<IActionResult> Get() 
         {
+            Stopwatch stopwatch = Stopwatch.StartNew();
+
             object result = await this.invoker.Execute(this.function, Request);
+
+            stopwatch.Stop();
+            System.Console.WriteLine($"Function invokation took {stopwatch.ElapsedTicks} ticks.");
+
             return this.GetSuitableActionResult(result);
         }
 
