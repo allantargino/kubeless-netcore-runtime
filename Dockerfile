@@ -11,15 +11,13 @@ COPY . ./
 RUN dotnet publish -c Release -o out
 
 # Build runtime image.
-FROM microsoft/aspnetcore:2.0
+# HACK: Need to use aspnetcore-build for now, just to test out 'dotnet restore'.
+FROM microsoft/aspnetcore-build:2.0
 WORKDIR /app
 COPY --from=build-env /app/src/Kubeless.WebAPI/out ./
-
-# TODO: Calling dotnet restore is not possible, because the image does not contains SDK functions.
-# Restore the functions dependencies.
-#WORKDIR /kubeless
-#RUN dotnet restore --packages packages
+COPY --from=build-env /app/startup.sh ./
+RUN chmod +x ./startup.sh
 
 # Run the web api application.
 WORKDIR /app
-#ENTRYPOINT ["dotnet", "Kubeless.WebAPI.dll"]
+ENTRYPOINT ["./startup.sh"]
