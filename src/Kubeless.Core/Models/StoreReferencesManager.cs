@@ -1,43 +1,62 @@
-﻿using Kubeless.Core.Interfaces;
-using Microsoft.CodeAnalysis;
-using System.Collections.Generic;
-using System;
-using System.Runtime.InteropServices;
-using System.IO;
-using System.Reflection;
-using System.Linq;
-using Kubeless.Core.Filters;
-
-namespace Kubeless.Core.Models
+﻿namespace Kubeless.Core.Models
 {
-    class StoreReferencesManager : IReferencesManager
+    using Kubeless.Core.Interfaces;
+    using Microsoft.CodeAnalysis;
+    using System.Collections.Generic;
+    using System;
+    using System.Runtime.InteropServices;
+    using System.IO;
+    using System.Reflection;
+    using System.Linq;
+    using Kubeless.Core.Filters;
+
+    public class StoreReferencesManager : IReferencesManager
     {
-        private static readonly string StorePath = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ?
-            Path.Combine(Environment.GetEnvironmentVariable("ProgramFiles"), @"dotnet\store\x64\netcoreapp2.0\") :
-            Path.Combine("/usr/share", @"dotnet/store/x64/netcoreapp2.0/");
+        private static string StorePath 
+        {
+            get 
+            {
+                string prefix = string.Empty;
+
+                if(RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                {
+                    prefix = Environment.GetEnvironmentVariable("ProgramFiles");
+                }
+                else
+                {
+                    prefix = Path.Combine("/", "usr", "share");
+
+                    // Maybe the dotnet folder is located in /usr/local/shared (in development on an mac f.e.).
+                    if(!Directory.Exists(Path.Combine(prefix, "dotnet")))
+                    {
+                        prefix = Path.Combine("/", "usr", "local", "share");
+                    }
+                }
+
+                return Path.Combine(prefix, "dotnet", "store", "x64", "netcoreapp2.0");
+            }
+        }
 
         public MetadataReference[] GetReferences()
         {
-            var dlls = Directory
+            IEnumerable<string> dlls = Directory
                 .EnumerateFiles(StorePath, "*.dll", SearchOption.AllDirectories)
                 .ApplyFilterOnDllVersion();
 
-            var dllFiles = from d in dlls select new FileInfo(d);
+            IEnumerable<FileInfo> dllFiles = from d in dlls select new FileInfo(d);
 
-            var references = new List<MetadataReference>();
+            IList<MetadataReference> references = new List<MetadataReference>();
 
-            //Not every .dll on the directory can be used during compilation. Some of them are just metadata.
-            //The following try-catch statement ensures only usable assemblies will be added to compilation process.
-            foreach (var dll in dlls)
+            // Not every .dll on the directory can be used during compilation. Some of them are just metadata.
+            // The following try-catch statement ensures only usable assemblies will be added to compilation process.
+            foreach (string dll in dlls)
             {
                 try
                 {
-                    var assembly = Assembly.LoadFile(dll);
+                    Assembly assembly = Assembly.LoadFile(dll);
                     references.Add(MetadataReference.CreateFromFile(dll));
                 }
-                catch (BadImageFormatException ex) {
-
-                }
+                catch (BadImageFormatException) {}
                 catch
                 {
                     throw;

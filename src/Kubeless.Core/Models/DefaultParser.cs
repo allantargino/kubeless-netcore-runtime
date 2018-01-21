@@ -1,12 +1,9 @@
-﻿using Kubeless.Core.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-
-namespace Kubeless.Core.Models
+﻿namespace Kubeless.Core.Models
 {
+    using Kubeless.Core.Interfaces;
+    using Microsoft.CodeAnalysis;
+    using Microsoft.CodeAnalysis.CSharp;
+
     public class DefaultParser : IParser
     {
         public SyntaxTree ParseText(string code)

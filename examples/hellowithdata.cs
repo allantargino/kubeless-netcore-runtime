@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using Microsoft.AspNetCore.Http;
 
-public class mycode
+public class hellowithdata
 {
     public object execute(HttpRequest request)
     {

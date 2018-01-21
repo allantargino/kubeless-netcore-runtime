@@ -1,7 +1,7 @@
 using System;
 using Microsoft.AspNetCore.Http;
 
-public class mycode
+public class helloget
 {
     public string execute(HttpRequest request)
     {

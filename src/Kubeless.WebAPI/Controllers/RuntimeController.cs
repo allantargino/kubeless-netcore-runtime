@@ -1,34 +1,65 @@
-﻿using Kubeless.Core.Interfaces;
-using Microsoft.AspNetCore.Mvc;
-
-namespace Kubeless.WebAPI.Controllers
+﻿namespace Kubeless.WebAPI.Controllers
 {
+    using System.Diagnostics;
+    using System.Threading.Tasks;
+    using Kubeless.Core.Interfaces;
+    using Microsoft.AspNetCore.Mvc;
+
     [Route("/")]
     public class RuntimeController : Controller
     {
-        private readonly IFunction _function;
-        private readonly IInvoker _invoker;
+        private readonly IFunction function;
+        private readonly IInvoker invoker;
 
         public RuntimeController(IFunction function, IInvoker invoker)
         {
-            _function = function;
-            _invoker = invoker;
+            this.function = function;
+            this.invoker = invoker;
         }
 
         [HttpPost]
-        public object Post([FromBody]object data)
+        public async Task<IActionResult> Post([FromBody]object data)
         {
-            if (Request.Body.CanSeek)
-                Request.Body.Position = 0;
+            // TODO: Create custom context (dynamic?) from Request.
 
-            return _invoker.Execute(_function, Request);
+            if (Request.Body.CanSeek)
+            {
+                Request.Body.Position = 0;
+            }
+            
+            object result = await this.invoker.Execute(this.function, Request);
+            return this.GetSuitableActionResult(result);
         }
 
         [HttpGet]
-        public object Get() => _invoker.Execute(_function, Request);
+        public async Task<IActionResult> Get() 
+        {
+            Stopwatch stopwatch = Stopwatch.StartNew();
+
+            object result = await this.invoker.Execute(this.function, Request);
+
+            stopwatch.Stop();
+            System.Console.WriteLine($"Function invokation took {stopwatch.ElapsedTicks} ticks.");
+
+            return this.GetSuitableActionResult(result);
+        }
 
         [HttpGet("/healthz")]
-        public IActionResult Health() => Ok();
-                
+        public IActionResult Health() => this.Ok();    
+
+        private IActionResult GetSuitableActionResult(object result)
+        {
+            if(result is string) 
+            {
+                return this.Ok(result);
+            }
+
+            if(result == null)
+            {
+                return this.Ok();
+            }
+
+            return this.Json(result);
+        }          
     }
 }

@@ -1,47 +1,46 @@
-﻿using Kubeless.Core.Interfaces;
-using Kubeless.Core.Models;
-using Microsoft.Extensions.Configuration;
-using System;
-
-namespace Kubeless.WebAPI.Utils
+﻿namespace Kubeless.WebAPI.Utils
 {
-    public class FunctionFactory
+    using System;
+    using System.IO;
+    using Kubeless.Core.Interfaces;
+    using Kubeless.Core.Models;
+    using Microsoft.Extensions.Configuration;
+
+    public static class FunctionFactory
     {
-        public static IFunctionSettings BuildFunctionSettings(IConfiguration configuration)
-        {
-            var moduleName = Environment.GetEnvironmentVariable("MOD_NAME");
-            if (string.IsNullOrEmpty(moduleName))
-                throw new ArgumentNullException("MOD_NAME");
-
-            var functionHandler = Environment.GetEnvironmentVariable("FUNC_HANDLER");
-            if (string.IsNullOrEmpty(moduleName))
-                throw new ArgumentNullException("FUNC_HANDLER");
-
-            var codePathSetting = configuration["Compiler:CodePath"];
-            if (string.IsNullOrEmpty(codePathSetting))
-                throw new ArgumentNullException("Compiler:CodePath");
-            var codePath = string.Concat(codePathSetting, moduleName, ".cs");
-            var code = new StringContent(codePath);
-
-            var requirementsPathSetting = configuration["Compiler:RequirementsPath"];
-            if (string.IsNullOrEmpty(requirementsPathSetting))
-                throw new ArgumentNullException("Compiler:RequirementsPath");
-            var requirementsPath = string.Concat(requirementsPathSetting, "requirements", ".xml");
-            var requirements = new StringContent(requirementsPath);
-
-            var assemblyPathConfiguration = configuration["Compiler:FunctionAssemblyPath"];
-            if (string.IsNullOrEmpty(assemblyPathConfiguration))
-                throw new ArgumentNullException("Compiler:FunctionAssemblyPath");
-            var assemblyPath = string.Concat(assemblyPathConfiguration, moduleName, ".dll");
-            var assembly = new BinaryContent(assemblyPath);
-
-            return new FunctionSettings(moduleName, functionHandler, code, requirements, assembly);
-        }
-
         public static IFunction BuildFunction(IConfiguration configuration)
         {
-            var settings = BuildFunctionSettings(configuration);
+            IFunctionSettings settings = BuildFunctionSettings(configuration);
             return new Function(settings);
+        }
+
+        private static IFunctionSettings BuildFunctionSettings(IConfiguration configuration)
+        {
+            string moduleName = Environment.GetEnvironmentVariable("MOD_NAME");
+            Guard.AgainstEmpty(moduleName, "MOD_NAME");
+
+            string functionHandler = Environment.GetEnvironmentVariable("FUNC_HANDLER");
+            Guard.AgainstEmpty(functionHandler, "FUNC_HANDLER");
+
+            string codePathSetting = configuration["Compiler:CodePath"];
+            Guard.AgainstEmpty(codePathSetting, "Compiler:CodePath");
+            string codePath = Path.Combine(codePathSetting, string.Concat(moduleName, ".cs")); 
+            StringContent code = new StringContent(codePath);
+
+            string requirementsPathSetting = configuration["Compiler:RequirementsPath"];
+            Guard.AgainstEmpty(requirementsPathSetting, "Compiler:RequirementsPath");
+            string requirementsPath = Path.Combine(requirementsPathSetting, string.Concat(moduleName, ".csproj"));
+            StringContent project = new StringContent(requirementsPath);
+
+            string projectAssetsPath = Path.Combine(requirementsPathSetting, "obj", "project.assets.json");
+            StringContent projectAssets = new StringContent(projectAssetsPath);
+
+            string assemblyPathConfiguration = configuration["Compiler:FunctionAssemblyPath"];
+            Guard.AgainstEmpty(assemblyPathConfiguration, "Compiler:FunctionAssemblyPath");
+            string assemblyPath = Path.Combine(assemblyPathConfiguration, string.Concat(moduleName, ".dll"));
+            BinaryContent assembly = new BinaryContent(assemblyPath);
+
+            return new FunctionSettings(moduleName, functionHandler, code, project, projectAssets, assembly);
         }
     }
 }
