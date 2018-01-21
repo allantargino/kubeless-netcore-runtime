@@ -28,7 +28,7 @@
 
             string requirementsPathSetting = configuration["Compiler:RequirementsPath"];
             Guard.AgainstEmpty(requirementsPathSetting, "Compiler:RequirementsPath");
-            string requirementsPath = string.Concat(requirementsPathSetting, "requirements", ".xml"); // TOOD: Use *.csproj?
+            string requirementsPath = string.Concat(requirementsPathSetting, moduleName, ".csproj");
             StringContent requirements = new StringContent(requirementsPath);
 
             string assemblyPathConfiguration = configuration["Compiler:FunctionAssemblyPath"];

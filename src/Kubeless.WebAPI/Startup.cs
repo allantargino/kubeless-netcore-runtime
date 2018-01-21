@@ -8,6 +8,7 @@
     using Kubeless.Core.Interfaces;
     using Kubeless.WebAPI.Utils;
     using Kubeless.Core.Models;
+    using System.Diagnostics;
 
     public sealed class Startup
     {

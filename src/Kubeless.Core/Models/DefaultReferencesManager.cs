@@ -6,14 +6,15 @@
 
     public class DefaultReferencesManager : IReferencesManager
     {
-        private IEnumerable<IReferencesManager> referencesManager;
+        private readonly IEnumerable<IReferencesManager> referencesManager;
 
         public DefaultReferencesManager()
         {
             this.referencesManager = new List<IReferencesManager>()
             {
                 new SharedReferencesManager(),
-                new StoreReferencesManager()
+                new StoreReferencesManager(),
+                new PackageReferencesManager(),
             };
         }
 

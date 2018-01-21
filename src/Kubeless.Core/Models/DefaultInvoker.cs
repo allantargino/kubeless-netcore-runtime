@@ -2,8 +2,10 @@
 {
     using Kubeless.Core.Interfaces;
     using System;
+    using System.Linq;
     using System.Reflection;
     using System.Threading.Tasks;
+    using System.IO;
 
     public class DefaultInvoker : IInvoker
     {
@@ -23,7 +25,24 @@
         private object ExecuteFunction(IFunction function, params object[] parameters)
         {
             // TODO: Create (il emit) a dynamic delegate to speed up the reflection call.
+
             Assembly assembly = Assembly.Load(function.FunctionSettings.Assembly.Content);
+
+            // HACK: Just to make example "hasher" work.
+            AppDomain.CurrentDomain.AssemblyResolve += (sender, args) => {
+                System.Console.WriteLine(args.Name);
+
+                if(args.Name.StartsWith("BCrypt.Net-Next")) 
+                {
+                    System.Console.WriteLine("LOADING BCRYPT");
+                    DirectoryInfo dir = new DirectoryInfo("../../examples");
+                    string dll = Path.Combine(dir.FullName, "packages/bcrypt.net-next/2.1.2/lib/netstandard2.0/BCrypt.Net-Next.dll");
+                    return Assembly.LoadFile(dll);
+                }
+
+                return null;
+            };
+
             Type type = assembly.GetType(function.FunctionSettings.ModuleName);
             object instance = Activator.CreateInstance(type);
 
