@@ -5,6 +5,8 @@ namespace Kubeless.Core.Models
     using System.IO;
     using System.Linq;
     using System.Reflection;
+    using System.Xml.Linq;
+    using System.Xml.XPath;
     using Kubeless.Core.Interfaces;
     using Microsoft.CodeAnalysis;
     using Newtonsoft.Json;
@@ -21,8 +23,8 @@ namespace Kubeless.Core.Models
 
         public MetadataReference[] GetReferences()
         {
-            // TODO: We should use the target framework info from the csproj file to map to the correct
-            //       path informations inside the project.assets.file.
+            // We use the target framework info from the csproj file to map to the correct
+            // path informations inside the project.assets.file.
             /*
                 <PropertyGroup>
                     <TargetFramework>netstandard2.0</TargetFramework>
@@ -37,44 +39,64 @@ namespace Kubeless.Core.Models
 
             IList<MetadataReference> references = new List<MetadataReference>();
 
-            // Read package references from obj/project.assets.json if it exists.
-            if(this.functionSettings.Project.FileExists && this.functionSettings.ProjectAssets.FileExists)
+            // Read the target fromework from the csproj file.
+            if(this.functionSettings.Project.FileExists)
             {
-                JObject projectAssets = JsonConvert.DeserializeObject<JObject>(this.functionSettings.ProjectAssets.Content);
-                foreach(JProperty dependency in projectAssets["targets"][".NETStandard,Version=v2.0"])
+                XElement project = XElement.Load(this.functionSettings.Project.FilePath);
+                XElement targetFramework = project.XPathSelectElement("./PropertyGroup/TargetFramework");         
+                string target = GetTargetFrameworkName(targetFramework.Value);
+
+                // Read package references from obj/project.assets.json if it exists.
+                if(this.functionSettings.ProjectAssets.FileExists)
                 {
-                    // Ignore Microsoft and System packages as they are alreay loaded.
-                    if(dependency.Name.StartsWith("Microsoft") 
-                        || dependency.Name.StartsWith("System") 
-                        || dependency.Name.StartsWith("NETStandard.Library"))
+                    JObject projectAssets = JsonConvert.DeserializeObject<JObject>(this.functionSettings.ProjectAssets.Content);
+                    foreach(JProperty dependency in projectAssets["targets"][target])
                     {
-                        continue;
+                        // Ignore Microsoft and System packages as they are alreay loaded.
+                        if(dependency.Name.StartsWith("Microsoft") 
+                            || dependency.Name.StartsWith("System") 
+                            || dependency.Name.StartsWith("NETStandard.Library"))
+                        {
+                            continue;
+                        }
+
+                        // Get path to the desired assembly file.
+                        JObject dependencyValue = (JObject)dependency.Value;
+                        JProperty compile = (JProperty)dependencyValue["compile"].First;
+
+                        string packagePath = dependency.Name; // f.e bcrypt.net-next/2.1.2
+                        string libaryPath = compile.Name; // f.e. lib/netstandard2.0/BCrypt.Net-Next.dll"
+                        string projectPath = this.functionSettings.Project.FileInfo.DirectoryName;
+
+                        string dll = Path.Combine(projectPath, "packages", packagePath, libaryPath);
+
+                        try
+                        {
+                            Assembly assembly = Assembly.LoadFile(dll);
+                            references.Add(MetadataReference.CreateFromFile(dll));
+                        }
+                        catch (BadImageFormatException) {}
+                        catch
+                        {
+                            throw;
+                        }      
                     }
-
-                    // Get path to the desired assembly file.
-                    JObject dependencyValue = (JObject)dependency.Value;
-                    JProperty compile = (JProperty)dependencyValue["compile"].First;
-
-                    string packagePath = dependency.Name; // f.e bcrypt.net-next/2.1.2
-                    string libaryPath = compile.Name; // f.e. lib/netstandard2.0/BCrypt.Net-Next.dll"
-                    string projectPath = this.functionSettings.Project.FileInfo.DirectoryName;
-
-                    string dll = Path.Combine(projectPath, "packages", packagePath, libaryPath);
-
-                    try
-                    {
-                        Assembly assembly = Assembly.LoadFile(dll);
-                        references.Add(MetadataReference.CreateFromFile(dll));
-                    }
-                    catch (BadImageFormatException) {}
-                    catch
-                    {
-                        throw;
-                    }      
                 }
             }
 
             return references.ToArray();
+        }
+
+        private static string GetTargetFrameworkName(string targetFramework)
+        {
+            // TODO: Use an complete official mapping list.
+            switch(targetFramework)
+            {
+                case "netstandard2.0":
+                    return ".NETStandard,Version=v2.0";
+                default:
+                    throw new InvalidOperationException($"The target framework is not supported: {targetFramework}");
+            }
         }
     }
 }
