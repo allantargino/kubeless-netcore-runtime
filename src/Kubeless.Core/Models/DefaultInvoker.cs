@@ -6,6 +6,8 @@
     using System.Reflection;
     using System.Threading.Tasks;
     using System.IO;
+    using System.Xml.Linq;
+    using System.Xml.XPath;
 
     public class DefaultInvoker : IInvoker
     {
@@ -54,20 +56,12 @@
         {
             Assembly assembly = Assembly.Load(function.FunctionSettings.Assembly.Content);
 
-            // HACK: Just to make example "hasher" work.
-            AppDomain.CurrentDomain.AssemblyResolve += (sender, args) => {
-
+            // Register handler for the assembly resolve event to load the required assemblies at runtime.
+            AppDomain.CurrentDomain.AssemblyResolve += (sender, args) => 
+            {
                 AssemblyName referenceAssembly = args.RequestingAssembly.GetReferencedAssemblies().FirstOrDefault(x => x.FullName == args.Name);
-                System.Console.WriteLine(referenceAssembly.FullName);
-
-                if(args.Name.StartsWith("BCrypt.Net-Next")) 
-                {
-                    DirectoryInfo dir = new DirectoryInfo(this.requirementsPath);
-                    string dll = Path.Combine(dir.FullName, "packages/bcrypt.net-next/2.1.2/lib/netstandard2.0/BCrypt.Net-Next.dll");
-                    return Assembly.LoadFile(dll);
-                }
-
-                return null;
+                string dll = ReferenceAssemblyFinder.FindReferenceAssembly(referenceAssembly, function.FunctionSettings);
+                return Assembly.LoadFile(dll);
             };
 
             Type type = assembly.GetExportedTypes().FirstOrDefault(x => x.Name == function.FunctionSettings.ModuleName);
