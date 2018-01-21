@@ -11,8 +11,6 @@
 
     public class SharedReferencesManager : IReferencesManager
     {
-        private static readonly string DotNetCoreSharedRefVersion = Environment.GetEnvironmentVariable("DOTNETCORESHAREDREF_VERSION");
-
         private static string SharedPath 
         {
             get 
@@ -34,8 +32,15 @@
                     }
                 }
 
-                return Path.Combine(prefix, "dotnet", "shared", "Microsoft.NETCore.App", DotNetCoreSharedRefVersion);
+                string mainPath = Path.Combine(prefix, "dotnet", "shared", "Microsoft.NETCore.App");
+                return GetLatestVersionInstalled(mainPath);
             }
+        }
+
+        private static string GetLatestVersionInstalled(string mainPath)
+        {
+            string latestVersion = Directory.GetDirectories(mainPath).OrderByDescending(x => x).FirstOrDefault();
+            return latestVersion;
         }
 
         public MetadataReference[] GetReferences()

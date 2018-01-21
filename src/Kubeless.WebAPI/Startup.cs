@@ -15,12 +15,6 @@
         public Startup(IConfiguration configuration, IHostingEnvironment env)
         {
             this.Configuration = configuration;
-
-            if (!env.IsDevelopment())
-            {
-                // TODO: Get latest available version.
-                Environment.SetEnvironmentVariable("DOTNETCORESHAREDREF_VERSION", "2.0.5");
-            }
         }
 
         public IConfiguration Configuration { get; }
