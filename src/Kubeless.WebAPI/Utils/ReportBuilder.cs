@@ -42,8 +42,8 @@
             builder.AppendKeyValue("Function Handler name", this.functionSettings.FunctionHandler);
             builder.AppendKeyValue("Code file path", this.functionSettings.Code.FilePath);
             builder.AppendCode("Code content", this.functionSettings.Code.Content);
-            builder.AppendKeyValue("Requirements file path", this.functionSettings.Requirements.FilePath);
-            builder.AppendCode("Requirements content", this.functionSettings.Requirements.Content);
+            builder.AppendKeyValue("Requirements file path", this.functionSettings.Project.FilePath);
+            builder.AppendCode("Requirements content", this.functionSettings.Project.Content);
             builder.AppendKeyValue("Assembly file path", this.functionSettings.Assembly.FilePath);
             builder.AppendKeyValue("Assembly exists", ((BinaryContent)this.functionSettings.Assembly).Exists.ToString());
         }

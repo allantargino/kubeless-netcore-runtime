@@ -1,6 +1,7 @@
 ﻿namespace Kubeless.WebAPI.Utils
 {
     using System;
+    using System.IO;
     using Kubeless.Core.Interfaces;
     using Kubeless.Core.Models;
     using Microsoft.Extensions.Configuration;
@@ -23,20 +24,23 @@
 
             string codePathSetting = configuration["Compiler:CodePath"];
             Guard.AgainstEmpty(codePathSetting, "Compiler:CodePath");
-            string codePath = string.Concat(codePathSetting, moduleName, ".cs"); 
+            string codePath = Path.Combine(codePathSetting, string.Concat(moduleName, ".cs")); 
             StringContent code = new StringContent(codePath);
 
             string requirementsPathSetting = configuration["Compiler:RequirementsPath"];
             Guard.AgainstEmpty(requirementsPathSetting, "Compiler:RequirementsPath");
-            string requirementsPath = string.Concat(requirementsPathSetting, moduleName, ".csproj");
-            StringContent requirements = new StringContent(requirementsPath);
+            string requirementsPath = Path.Combine(requirementsPathSetting, string.Concat(moduleName, ".csproj"));
+            StringContent project = new StringContent(requirementsPath);
+
+            string projectAssetsPath = Path.Combine(requirementsPathSetting, "obj", "project.assets.json");
+            StringContent projectAssets = new StringContent(projectAssetsPath);
 
             string assemblyPathConfiguration = configuration["Compiler:FunctionAssemblyPath"];
             Guard.AgainstEmpty(assemblyPathConfiguration, "Compiler:FunctionAssemblyPath");
-            string assemblyPath = string.Concat(assemblyPathConfiguration, moduleName, ".dll");
+            string assemblyPath = Path.Combine(assemblyPathConfiguration, string.Concat(moduleName, ".dll"));
             BinaryContent assembly = new BinaryContent(assemblyPath);
 
-            return new FunctionSettings(moduleName, functionHandler, code, requirements, assembly);
+            return new FunctionSettings(moduleName, functionHandler, code, project, projectAssets, assembly);
         }
     }
 }

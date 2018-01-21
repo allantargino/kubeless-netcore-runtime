@@ -11,6 +11,8 @@
     {
         private readonly string requirementsPath;
 
+        private InvokationData invokationData;
+
         public DefaultInvoker(string requirementsPath)
         {
             this.requirementsPath = requirementsPath;
@@ -31,19 +33,35 @@
 
         private object ExecuteFunction(IFunction function, params object[] parameters)
         {
-            // TODO: Create (il emit) a dynamic delegate to speed up the reflection call.
+            // Create invokation data if none exists. This caches assembly and type loading.
+            if(this.invokationData == null) 
+            {
+                this.invokationData = this.CreateInvokationData(function);
+            }
 
-            // TODO: LOAD only once
+            // TODO: Create (il emit) a dynamic delegate to speed up the reflection call.
+            object returnedValue = this.invokationData.FunctionType.InvokeMember(
+                function.FunctionSettings.FunctionHandler,
+                BindingFlags.Default | BindingFlags.InvokeMethod,
+                null,
+                this.invokationData.FunctionInstance,
+                parameters);
+
+            return returnedValue;
+        }
+
+        private InvokationData CreateInvokationData(IFunction function)
+        {
             Assembly assembly = Assembly.Load(function.FunctionSettings.Assembly.Content);
 
             // HACK: Just to make example "hasher" work.
-            // TODO: Just load only once.
             AppDomain.CurrentDomain.AssemblyResolve += (sender, args) => {
-                System.Console.WriteLine(args.Name);
+
+                AssemblyName referenceAssembly = args.RequestingAssembly.GetReferencedAssemblies().FirstOrDefault(x => x.FullName == args.Name);
+                System.Console.WriteLine(referenceAssembly.FullName);
 
                 if(args.Name.StartsWith("BCrypt.Net-Next")) 
                 {
-                    System.Console.WriteLine("LOADING BCRYPT");
                     DirectoryInfo dir = new DirectoryInfo(this.requirementsPath);
                     string dll = Path.Combine(dir.FullName, "packages/bcrypt.net-next/2.1.2/lib/netstandard2.0/BCrypt.Net-Next.dll");
                     return Assembly.LoadFile(dll);
@@ -55,13 +73,12 @@
             Type type = assembly.GetExportedTypes().FirstOrDefault(x => x.Name == function.FunctionSettings.ModuleName);
             object instance = Activator.CreateInstance(type);
 
-            object returnedValue = type.InvokeMember(function.FunctionSettings.FunctionHandler,
-                                    BindingFlags.Default | BindingFlags.InvokeMethod,
-                                    null,
-                                    instance,
-                                    parameters);
-
-            return returnedValue;
+            return new InvokationData 
+            {
+                FunctionAssembly = assembly,
+                FunctionType = type,
+                FunctionInstance = instance,
+            };
         }
     }
 }

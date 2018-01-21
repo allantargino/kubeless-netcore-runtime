@@ -27,7 +27,7 @@
             // Compile Function.
             string requirementsPath = this.Configuration["Compiler:RequirementsPath"];
             IFunction function = FunctionFactory.BuildFunction(this.Configuration);
-            ICompiler compiler = new DefaultCompiler(new DefaultParser(), new DefaultReferencesManager(requirementsPath));
+            ICompiler compiler = new DefaultCompiler(new DefaultParser(), new DefaultReferencesManager(function.FunctionSettings));
 
             if (!function.IsCompiled())
             {

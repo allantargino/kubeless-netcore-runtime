@@ -8,7 +8,7 @@
         public BinaryContent(string filePath)
         {
             this.FilePath = filePath;
-            if (File.Exists(filePath))
+            if (this.FileExists)
             {
                 this.Content = File.ReadAllBytes(filePath);
                 this.Exists = true;
@@ -20,6 +20,10 @@
         }
 
         public string FilePath { get; }
+
+        public FileInfo FileInfo => new FileInfo(this.FilePath);
+
+        public bool FileExists => File.Exists(this.FilePath);
 
         public byte[] Content { get; private set; }
 

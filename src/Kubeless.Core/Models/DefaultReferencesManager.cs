@@ -8,13 +8,13 @@
     {
         private readonly IEnumerable<IReferencesManager> referencesManager;
 
-        public DefaultReferencesManager(string requirementsPath)
+        public DefaultReferencesManager(IFunctionSettings functionSettings)
         {
             this.referencesManager = new List<IReferencesManager>()
             {
                 new SharedReferencesManager(),
                 new StoreReferencesManager(),
-                new PackageReferencesManager(requirementsPath),
+                new PackageReferencesManager(functionSettings),
             };
         }
 

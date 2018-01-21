@@ -8,7 +8,9 @@
 
         IFileContent<string> Code { get; }
 
-        IFileContent<string> Requirements { get; }
+        IFileContent<string> Project { get; }
+
+        IFileContent<string> ProjectAssets { get; }
         
         IFileContent<byte[]> Assembly { get; }
     }
