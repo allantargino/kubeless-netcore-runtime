@@ -3,9 +3,9 @@ using Microsoft.AspNetCore.Http;
 
 namespace Fluxera.Functions
 {
-    public class hasher
+    public class Hasher
     {
-        public string execute(HttpRequest request)
+        public string Execute(HttpRequest request)
         {
             return BCrypt.Net.BCrypt.HashPassword("hello world", 10);
         }
