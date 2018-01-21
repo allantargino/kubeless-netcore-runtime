@@ -23,7 +23,7 @@
 
             string codePathSetting = configuration["Compiler:CodePath"];
             Guard.AgainstEmpty(codePathSetting, "Compiler:CodePath");
-            string codePath = string.Concat(codePathSetting, moduleName, ".cs"); // TOOD: ModuleName = FileName? ModuleName = ClassName?
+            string codePath = string.Concat(codePathSetting, moduleName, ".cs"); 
             StringContent code = new StringContent(codePath);
 
             string requirementsPathSetting = configuration["Compiler:RequirementsPath"];
@@ -33,7 +33,7 @@
 
             string assemblyPathConfiguration = configuration["Compiler:FunctionAssemblyPath"];
             Guard.AgainstEmpty(assemblyPathConfiguration, "Compiler:FunctionAssemblyPath");
-            string assemblyPath = string.Concat(assemblyPathConfiguration, moduleName, ".dll"); // TODO: ModuleName = DllName?
+            string assemblyPath = string.Concat(assemblyPathConfiguration, moduleName, ".dll");
             BinaryContent assembly = new BinaryContent(assemblyPath);
 
             return new FunctionSettings(moduleName, functionHandler, code, requirements, assembly);

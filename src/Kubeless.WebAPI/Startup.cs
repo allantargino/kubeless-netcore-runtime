@@ -25,8 +25,9 @@
             services.AddMvc();
 
             // Compile Function.
+            string requirementsPath = this.Configuration["Compiler:RequirementsPath"];
             IFunction function = FunctionFactory.BuildFunction(this.Configuration);
-            ICompiler compiler = new DefaultCompiler(new DefaultParser(), new DefaultReferencesManager());
+            ICompiler compiler = new DefaultCompiler(new DefaultParser(), new DefaultReferencesManager(requirementsPath));
 
             if (!function.IsCompiled())
             {
@@ -35,7 +36,7 @@
 
             services.AddSingleton<IFunction>(function);
             services.AddSingleton<IFunctionSettings>(serviceProvider => serviceProvider.GetService<IFunction>().FunctionSettings);
-            services.AddSingleton<IInvoker, DefaultInvoker>();
+            services.AddSingleton<IInvoker>(new DefaultInvoker(requirementsPath));
             services.AddSingleton<ReportBuilder>();
         }
 

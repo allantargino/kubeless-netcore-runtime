@@ -9,6 +9,13 @@
 
     public class DefaultInvoker : IInvoker
     {
+        private readonly string requirementsPath;
+
+        public DefaultInvoker(string requirementsPath)
+        {
+            this.requirementsPath = requirementsPath;
+        }
+
         public async Task<object> Execute(IFunction function, params object[] parameters)
         {
             object result = this.ExecuteFunction(function, parameters);
@@ -26,16 +33,18 @@
         {
             // TODO: Create (il emit) a dynamic delegate to speed up the reflection call.
 
+            // TODO: LOAD only once
             Assembly assembly = Assembly.Load(function.FunctionSettings.Assembly.Content);
 
             // HACK: Just to make example "hasher" work.
+            // TODO: Just load only once.
             AppDomain.CurrentDomain.AssemblyResolve += (sender, args) => {
                 System.Console.WriteLine(args.Name);
 
                 if(args.Name.StartsWith("BCrypt.Net-Next")) 
                 {
                     System.Console.WriteLine("LOADING BCRYPT");
-                    DirectoryInfo dir = new DirectoryInfo("../../examples");
+                    DirectoryInfo dir = new DirectoryInfo(this.requirementsPath);
                     string dll = Path.Combine(dir.FullName, "packages/bcrypt.net-next/2.1.2/lib/netstandard2.0/BCrypt.Net-Next.dll");
                     return Assembly.LoadFile(dll);
                 }
