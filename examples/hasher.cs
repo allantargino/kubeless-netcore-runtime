@@ -1,10 +1,13 @@
 using System;
 using Microsoft.AspNetCore.Http;
 
-public class hasher
+namespace Fluxera.Functions
 {
-    public string execute(HttpRequest request)
+    public class hasher
     {
-        return BCrypt.Net.BCrypt.HashPassword("hello world", 10);
+        public string execute(HttpRequest request)
+        {
+            return BCrypt.Net.BCrypt.HashPassword("hello world", 10);
+        }
     }
 }

@@ -52,7 +52,7 @@
                 return null;
             };
 
-            Type type = assembly.GetType(function.FunctionSettings.ModuleName);
+            Type type = assembly.GetExportedTypes().FirstOrDefault(x => x.Name == function.FunctionSettings.ModuleName);
             object instance = Activator.CreateInstance(type);
 
             object returnedValue = type.InvokeMember(function.FunctionSettings.FunctionHandler,
