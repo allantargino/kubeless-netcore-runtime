@@ -12,7 +12,7 @@ To create a function simply execute `dotnet new classlib -o MyFunction` to creat
 
 You can name the function handler method anything you like, but the method must declare one parameter: the `HttpContext` of the http request. The method can return any value you like. 
 
-``'csharp
+```csharp
 namespace Functions
 {
     using System;
